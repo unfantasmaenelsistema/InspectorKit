@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>InspectorKit · Un Fantasma en el Sistema</title>
+<meta name="description" content="Caja de inspección forense y para CTF, gratis y en tu navegador: tipo real de un archivo, metadatos, datos ocultos y esteganografía; hashes e identificador; codificaciones y cifrados clásicos con ataques sin clave; auditoría de cabeceras HTTP.">
+<link rel="icon" type="image/png" href="assets/ghost.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/core.css">
+<script>(function(){var t=null;try{t=localStorage.getItem('ik_theme')}catch(e){}if(!t)t=matchMedia('(prefers-color-scheme: light)').matches?'light':'dark';document.documentElement.setAttribute('data-theme',t)})();</script>
+</head>
+<body>
+<header class="ik-top" id="ikTop"></header>
+
+<main class="wrap">
+
+  <!-- ───────────── INICIO ───────────── -->
+  <section data-tab="inicio" hidden>
+    <div class="wrap" style="padding:0">
+      <section class="panel hero">
+        <div>
+          <span class="tag" style="color:var(--accent)" data-t="home.badge">Gratis · código abierto · sin servidor</span>
+          <h1 class="h1" style="margin:10px 0 8px">InspectorKit</h1>
+          <p class="lead" data-t="home.lead"></p>
+        </div>
+        <img src="assets/ghost.png" alt="" width="112" height="112">
+      </section>
+
+      <section class="tools">
+        <a class="tool-card" href="#archivo">
+          <span class="ico">🗂️</span>
+          <h2 data-t="home.file"></h2>
+          <p data-t="home.fileD"></p>
+          <ul><li data-t="home.f1"></li><li data-t="home.f2"></li><li data-t="home.f3"></li><li data-t="home.f4"></li></ul>
+          <span class="was" data-t="home.wasFile"></span>
+          <span class="go" data-t="home.open"></span>
+        </a>
+        <a class="tool-card" href="#hash">
+          <span class="ico">#️⃣</span>
+          <h2 data-t="home.hash"></h2>
+          <p data-t="home.hashD"></p>
+          <ul><li data-t="home.h1"></li><li data-t="home.h2"></li><li data-t="home.h3"></li></ul>
+          <span class="was" data-t="home.wasHash"></span>
+          <span class="go" data-t="home.open"></span>
+        </a>
+        <a class="tool-card" href="#cifrados">
+          <span class="ico">🔐</span>
+          <h2 data-t="home.cipher"></h2>
+          <p data-t="home.cipherD"></p>
+          <ul><li data-t="home.c1"></li><li data-t="home.c2"></li><li data-t="home.c3"></li></ul>
+          <span class="was" data-t="home.wasCipher"></span>
+          <span class="go" data-t="home.open"></span>
+        </a>
+        <a class="tool-card" href="#cabeceras">
+          <span class="ico">🌐</span>
+          <h2 data-t="home.headers"></h2>
+          <p data-t="home.headersD"></p>
+          <ul><li data-t="home.w1"></li><li data-t="home.w2"></li><li data-t="home.w3"></li></ul>
+          <span class="was" data-t="home.wasHeaders"></span>
+          <span class="go" data-t="home.open"></span>
+        </a>
+      </section>
+
+      <section class="panel">
+        <div class="panel-title" data-t="home.flowT"></div>
+        <p data-t-html="home.flow"></p>
+      </section>
+
+      <section class="grid2">
+        <div class="panel">
+          <div class="panel-title" data-t="home.privT"></div>
+          <p data-t-html="home.priv"></p>
+        </div>
+        <div class="panel">
+          <div class="panel-title" data-t="home.relT"></div>
+          <ul class="small" style="margin-left:18px">
+            <li data-t-html="home.rel1"></li>
+            <li data-t-html="home.rel2"></li>
+            <li data-t-html="home.rel3"></li>
+          </ul>
+        </div>
+      </section>
+    </div>
+  </section>
+
+  <!-- ───────────── ARCHIVO ───────────── -->
+  <section data-tab="archivo" hidden>
+    <div class="wrap" style="padding:0">
+      <section class="panel">
+        <div class="panel-title"><span data-t="file.title"></span></div>
+        <div class="drop" id="fileDrop" tabindex="0" role="button" data-t-aria="file.dropAria">
+          <input type="file" id="fileInput">
+          <b data-t="file.drop"></b>
+          <span class="muted" data-t="file.dropSub"></span>
+        </div>
+        <div class="crumbs" id="fileCrumbs" style="margin-top:10px" hidden></div>
+      </section>
+      <div id="fileOut"></div>
+    </div>
+  </section>
+
+  <!-- ───────────── HASH ───────────── -->
+  <section data-tab="hash" hidden>
+    <div class="wrap" style="padding:0">
+      <section class="panel">
+        <div class="panel-title"><span data-t="hash.calcT"></span>
+          <div class="seg" role="group" id="hashMode">
+            <button type="button" data-mode="text" aria-pressed="true" data-t="hash.text"></button>
+            <button type="button" data-mode="file" aria-pressed="false" data-t="hash.file"></button>
+          </div>
+        </div>
+        <div id="hashTextBox" class="field">
+          <textarea class="textarea" id="hashText" data-t-ph="hash.textPh" spellcheck="false"></textarea>
+          <p class="muted small" data-t="hash.textNote"></p>
+        </div>
+        <div id="hashFileBox" class="field" hidden>
+          <div class="drop" id="hashDrop" tabindex="0" role="button">
+            <input type="file" id="hashFileInput">
+            <b data-t="hash.drop"></b>
+            <span class="muted" id="hashFileName" data-t="file.dropSub"></span>
+          </div>
+        </div>
+        <div class="row" style="margin-bottom:12px">
+          <div class="field"><label class="label" for="hashExpected" data-t="hash.expected"></label><input class="input" id="hashExpected" data-t-ph="hash.expectedPh" spellcheck="false" autocomplete="off"></div>
+          <label class="check"><input type="checkbox" id="hashUpper"> <span data-t="hash.upper"></span></label>
+        </div>
+        <div id="hashVerdict"></div>
+        <div id="hashOut"></div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-title"><span data-t="hash.idT"></span></div>
+        <textarea class="textarea" id="hashId" data-t-ph="hash.idPh" spellcheck="false"></textarea>
+        <div class="btns" style="margin:10px 0">
+          <button class="btn" type="button" id="hashIdBtn" data-t="hash.idBtn"></button>
+          <button class="btn ghost" type="button" id="hashIdSample" data-t="hash.sample"></button>
+        </div>
+        <div id="hashIdOut"></div>
+      </section>
+    </div>
+  </section>
+
+  <!-- ───────────── CIFRADOS ───────────── -->
+  <section data-tab="cifrados" hidden>
+    <div class="wrap" style="padding:0">
+      <section class="panel">
+        <div class="panel-title"><span data-t="ci.inT"></span><span class="muted mono small" id="ciInInfo"></span></div>
+        <textarea class="textarea" id="ciIn" data-t-ph="ci.inPh" spellcheck="false" style="min-height:120px"></textarea>
+        <div class="row" style="margin-top:10px">
+          <div class="field" style="flex:2 1 220px"><label class="label" for="ciOp" data-t="ci.op"></label><select class="select" id="ciOp"></select></div>
+          <div class="field" style="flex:0 0 auto"><span class="label" data-t="ci.mode"></span>
+            <div class="seg" role="group" id="ciMode">
+              <button type="button" data-mode="dec" aria-pressed="true" data-t="ci.dec"></button>
+              <button type="button" data-mode="enc" aria-pressed="false" data-t="ci.enc"></button>
+            </div>
+          </div>
+        </div>
+        <div class="row" id="ciParams" style="margin-top:10px"></div>
+        <div class="btns" style="margin-top:12px">
+          <button class="btn" type="button" id="ciMagic" data-t="ci.magic"></button>
+          <button class="btn ghost" type="button" id="ciCrack" data-t="ci.crack"></button>
+          <button class="btn ghost" type="button" id="ciSample" data-t="ci.sample"></button>
+        </div>
+        <p class="muted small" style="margin-top:8px" data-t="ci.help"></p>
+      </section>
+
+      <section class="panel">
+        <div class="panel-title"><span data-t="ci.outT"></span>
+          <div class="seg" role="group" id="ciView">
+            <button type="button" data-view="text" aria-pressed="true" data-t="ci.viewText"></button>
+            <button type="button" data-view="hex" aria-pressed="false">HEX</button>
+          </div>
+        </div>
+        <div class="crumbs" id="ciRecipe" style="margin-bottom:8px"></div>
+        <div id="ciErr"></div>
+        <pre class="out" id="ciOut" aria-live="polite"></pre>
+        <div class="btns" style="margin-top:10px">
+          <button class="btn ghost small" type="button" id="ciCopy" data-t="c.copy"></button>
+          <button class="btn ghost small" type="button" id="ciChain" data-t="ci.chain"></button>
+          <button class="btn ghost small" type="button" id="ciToHash" data-t="c.toHash"></button>
+          <button class="btn ghost small" type="button" id="ciToFile" data-t="ci.toFile"></button>
+          <button class="btn ghost small" type="button" id="ciDl" data-t="c.download"></button>
+        </div>
+      </section>
+
+      <section class="panel" id="ciCands" hidden>
+        <div class="panel-title"><span id="ciCandsT"></span></div>
+        <div id="ciCandsOut"></div>
+      </section>
+    </div>
+  </section>
+
+  <!-- ───────────── CABECERAS ───────────── -->
+  <section data-tab="cabeceras" hidden>
+    <div class="wrap" style="padding:0">
+      <section class="panel">
+        <div class="panel-title"><span data-t="hd.inT"></span></div>
+        <div class="notice" data-t-html="hd.why"></div>
+        <div class="row" style="margin:12px 0">
+          <div class="field" style="flex:3 1 260px"><label class="label" for="hdUrl" data-t="hd.url"></label><input class="input" id="hdUrl" placeholder="https://ejemplo.com/" spellcheck="false" autocomplete="off" inputmode="url"></div>
+          <button class="btn ghost" type="button" id="hdTry" data-t="hd.try"></button>
+        </div>
+        <div id="hdCmds"></div>
+        <div id="hdTryOut"></div>
+        <label class="label" for="hdRaw" style="margin-top:12px" data-t="hd.paste"></label>
+        <textarea class="textarea" id="hdRaw" data-t-ph="hd.pastePh" spellcheck="false" style="min-height:160px"></textarea>
+        <div class="btns" style="margin-top:10px">
+          <button class="btn" type="button" id="hdGo" data-t="hd.go"></button>
+          <button class="btn ghost" type="button" id="hdSample" data-t="hd.sample"></button>
+          <button class="btn ghost" type="button" id="hdClear" data-t="hd.clear"></button>
+        </div>
+      </section>
+      <div id="hdOut"></div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="ik-foot" id="ikFoot"></footer>
+
+<script src="assets/core.js"></script>
+<script src="assets/engine/hash.js"></script>
+<script src="assets/engine/cipher.js"></script>
+<script src="assets/engine/bytes.js"></script>
+<script src="assets/engine/stego.js"></script>
+<script src="assets/engine/png.js"></script>
+<script src="assets/engine/headers.js"></script>
+<script src="assets/vendor/exifr-7.1.3.full.umd.js"></script>
+<script src="assets/home.js"></script>
+<script src="assets/app-file.js"></script>
+<script src="assets/app-hash.js"></script>
+<script src="assets/app-cipher.js"></script>
+<script src="assets/app-headers.js"></script>
+</body>
+</html>
